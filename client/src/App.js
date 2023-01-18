@@ -1,78 +1,104 @@
 import logo from './logo.svg';
 import './App.css';
 import Customer from './components/Customer';
+import CustomerAdd from './components/CustomerAdd';
 import { render } from '@testing-library/react';
 import { createContext } from 'react';
 import TableHead from '@mui/material/TableHead';
 import Table from '@mui/material/Table';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import { TableBody } from '@mui/material';
-import { withStyles}  from '@mui/material';
+import {  withStyles } from '@material-ui/styles';
+import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
+import React, {Component} from 'react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-const styles = theme =>({
-  root:{
-    width : '100%',
-    marginTop : theme.spacing.unit *3,
-    overflowX : "auto"
-  },
-  table:{
-    minWidth : 1080
+const styles = {
+  root: {
+    width: "100%",
+    overflowX: "auto" },
+  table: {
+    minWidth: 1080},
+  progress: {
+    margin: 2
+  }
+};
+class App extends Component{
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers: '',
+      completed: 0
+    }
+    this.stateRefresh = this.stateRefresh.bind(this);
+  }
+  stateRefresh() {
+    this.setState({
+      customers: '',
+      completed: 0
+    });
+    this.callApi()
+      .then(res => this.setState({customers: res}))
+      .catch(err => console.log(err));
   }
 
-})
+  componentDidMount() {
+      this.callApi()
+      .then(res=> this.setState({customers:res}))
+      .catch(err => console.log(err));
+    }
+   
+  
+  componentWillUnmount() {
+    clearInterval(this.timer);}
 
+  callApi = async()=>{
+      const response = await fetch('api/customers');
+      const body = await response.json();
+      return body;
+    }
+  
+  progress = () => {
+    const { completed } = this.state;
+    this.setState({ completed: completed >= 100 ? 0 : completed + 1 });
+  }
+  render() {
+    const {classes} = this.props;
+    return(
+      <div>
+        <Paper className={classes.root}>
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell>번호</TableCell>
+                <TableCell>이미지</TableCell>
+                <TableCell>이름</TableCell>
+                <TableCell>생년월일</TableCell>
+                <TableCell>성별</TableCell>
+                <TableCell>직업</TableCell>
+                <TableCell>설정</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {this.state.customers ?
+                this.state.customers.map(c => {
+                  return <Customer stateRefresh={this.stateRefresh} key={c.id} id={c.id} image={c.image} name={c.name} birthday={c.birthday} gender={c.gender} job={c.job} />
+                }) :
+                <TableRow>
+                  <TableCell colSpan="6" align="center">
+                    <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed} />
+                  </TableCell>
+                </TableRow>
+              }
+            </TableBody>
+          </Table>
 
-const customers =[
-{
-  'id' : 1,
-  'image' : 'https://placeimg.com/32/32/1',
-  'name' : '차성민 ',
-  'birthday' : '995959',
-  'gender' : 'man',
-  'job' : 'student'
-},
-{
-  'id' : 2,
-  'image' : 'https://placeimg.com/32/32/2',
-  'name' : '차민경 ',
-  'birthday' : '995959',
-  'gender' : 'woman',
-  'job' : 'banker'
-},
-{
-  'id' : 3,
-  'image' : 'https://placeimg.com/32/32/3',
-  'name' : '차종원 ',
-  'birthday' : '992225959',
-  'gender' : 'man',
-  'job' : 'student'
+        </Paper>
+        <CustomerAdd stateRefresh={this.stateRefresh} />
+
+      </div>
+    );
+  }
 }
-]
-
-function App() {
-  const {classes} = this.props;
-  return (
-    <Paper className = {classes.root}>    
-      <Table className = {classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>번호</TableCell>
-            <TableCell>이미지</TableCell>
-            <TableCell>이름</TableCell>
-            <TableCell>생년월일</TableCell>
-            <TableCell>성별</TableCell>
-            <TableCell>직업</TableCell>
-
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {customers.map(c =>{ return(<Customer key = {c.id} id ={c.id} image = {c.image} name = {c.name} birthday = {c.birthday} gender = {c.gender} job = {c.job}/>)})}   
-        </TableBody>
-      </Table>
-    </Paper>
-  )
-}
-
-export default withStyles(styles)(App);
+export default withStyles(styles)(App)
