@@ -3,13 +3,29 @@
     "version": "1.0.0",
     "scripts": {
         "client": "cd client && yarn start",
-        "serve": "nodemon server.js",
+        "server": "nodemon server.js",
         "dev": "concurrently --kill-others-on-fail \" yarn server\" \"yarn client\""
     },
     "dependencies": {
+        "@emotion/react": "^11.10.5",
+        "@emotion/styled": "^11.10.5",
+        "@finastra/circular-progress": "^1.2.17",
+        "@material-ui/styles": "^4.11.5",
+        "@mui/icons-material": "^5.11.0",
+        "@mui/lab": "^5.0.0-alpha.115",
+        "@mui/material": "^5.11.4",
+        "@mui/styled-engine-sc": "^5.11.0",
+        "@mui/styles": "^5.11.2",
+        "axios": "^1.2.2",
         "body-parser": "^1.20.1",
         "express": "^4.18.2",
-        "nodemon": "^2.0.20"
+        "http-proxy-middleware": "^2.0.6",
+        "multer": "^1.4.5-lts.1",
+        "mysql": "^2.18.1",
+        "nodemon": "^2.0.20",
+        "react": "^17.0.1",
+        "serve": "^14.1.2",
+        "styled-components": "^5.3.6"
     },
     "devDependencies": {
         "concurrently": "^4.0.1"
